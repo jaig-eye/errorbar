@@ -81399,12 +81399,16 @@ function rowNotes(rows) {
 }
 function footer(suite, comparison) {
   const parts = [];
-  const trialsLabel = suite.status === "compared" ? `${suite.paired_cases} paired cases \xD7 ${suite.trials.head} trials` : `${suite.trials.head} trials per case`;
+  const trialsLabel = suite.status === "compared" ? `${suite.paired_cases} paired cases \xD7 ${suite.trials.head} trial${suite.trials.head === 1 ? "" : "s"}` : `${suite.trials.head} trial${suite.trials.head === 1 ? "" : "s"} per case`;
   parts.push(trialsLabel);
   const gatedRows = suite.rows.filter((r) => r.gated && r.n > 0);
   if (gatedRows.length > 0) {
     const worst = Math.max(...gatedRows.map((r) => r.mde));
-    if (Number.isFinite(worst)) parts.push(`detects drops \u2265 ${worst.toFixed(2)} at 80% power`);
+    if (Number.isFinite(worst)) {
+      parts.push(
+        worst < 5e-3 ? "no variation between runs to size the noise" : `detects drops \u2265 ${worst.toFixed(2)} at 80% power`
+      );
+    }
   }
   if (suite.flaky_cases > 0) {
     parts.push(`${suite.flaky_cases} flaky case${suite.flaky_cases === 1 ? "" : "s"}`);

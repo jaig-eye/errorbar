@@ -74,6 +74,17 @@ describe('renderReport', () => {
     expect(text).toContain('baseline main@abcdef0');
   });
 
+  it('does not claim a detectable drop when nothing varied, and says "1 trial"', () => {
+    const cases = flatCases(20, 'm', () => [0.5]);
+    const text = renderReport(
+      compare(makeResults([makeSuite({ cases })]), makeResults([makeSuite({ cases })])),
+    );
+    expect(text).toContain('20 paired cases × 1 trial ·');
+    expect(text).toContain('no variation between runs to size the noise');
+    expect(text).not.toContain('detects drops');
+    expect(text).not.toContain('1 trials');
+  });
+
   it('shows plain scores when there is no baseline', () => {
     const head = makeResults([makeSuite({ cases: flatCases(20, 'm', () => [0.5, 0.5, 0.5]) })]);
     const text = renderReport(compare(null, head), { banner: 'First run.' });

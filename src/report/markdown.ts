@@ -111,13 +111,20 @@ function footer(suite: SuiteComparison, comparison: Comparison): string {
   const parts: string[] = [];
   const trialsLabel =
     suite.status === 'compared'
-      ? `${suite.paired_cases} paired cases × ${suite.trials.head} trials`
-      : `${suite.trials.head} trials per case`;
+      ? `${suite.paired_cases} paired cases × ${suite.trials.head} trial${suite.trials.head === 1 ? '' : 's'}`
+      : `${suite.trials.head} trial${suite.trials.head === 1 ? '' : 's'} per case`;
   parts.push(trialsLabel);
   const gatedRows = suite.rows.filter((r) => r.gated && r.n > 0);
   if (gatedRows.length > 0) {
     const worst = Math.max(...gatedRows.map((r) => r.mde));
-    if (Number.isFinite(worst)) parts.push(`detects drops ≥ ${worst.toFixed(2)} at 80% power`);
+    if (Number.isFinite(worst)) {
+      // An MDE that rounds to 0.00 means the cases never differed, not that any drop is detectable.
+      parts.push(
+        worst < 0.005
+          ? 'no variation between runs to size the noise'
+          : `detects drops ≥ ${worst.toFixed(2)} at 80% power`,
+      );
+    }
   }
   if (suite.flaky_cases > 0) {
     parts.push(`${suite.flaky_cases} flaky case${suite.flaky_cases === 1 ? '' : 's'}`);
