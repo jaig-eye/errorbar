@@ -1,0 +1,48 @@
+{"id":"ship-standard","vars":{"question":"How many business days does standard shipping take?"},"expected":"3-5 business days","relevant_ids":["shipping-times"]}
+{"id":"ship-free","vars":{"question":"Which orders ship free?"},"expected":"50 dollars","relevant_ids":["shipping-times"]}
+{"id":"track-where","vars":{"question":"Where can I see where my parcel is right now?"},"expected":"Track parcel","relevant_ids":["tracking"]}
+{"id":"track-refresh","vars":{"question":"How often does tracking update?"},"expected":"30 minutes","relevant_ids":["tracking"]}
+{"id":"return-days","vars":{"question":"Within how many days can I return an unused item?"},"expected":"30 days","relevant_ids":["returns"]}
+{"id":"return-cost","vars":{"question":"Are returns free?"},"expected":"prepaid label","relevant_ids":["returns"]}
+{"id":"refund-time","vars":{"question":"How many business days does processing a refund take?"},"expected":"5-7 business days","relevant_ids":["refunds"]}
+{"id":"refund-fee","vars":{"question":"Are shipping fees refunded?"},"expected":"damaged","relevant_ids":["refunds"]}
+{"id":"warranty-length","vars":{"question":"How long is the hardware guarantee?"},"expected":"12 month","relevant_ids":["warranty"]}
+{"id":"warranty-water","vars":{"question":"Does the warranty cover a drop in the water?"},"expected":"water damage","relevant_ids":["warranty"]}
+{"id":"pay-cards","vars":{"question":"Which payment cards do you accept?"},"expected":"Visa","relevant_ids":["payment-methods"]}
+{"id":"pay-cash","vars":{"question":"Can I pay the courier in cash?"},"expected":"not available","relevant_ids":["payment-methods"]}
+{"id":"delete-how","vars":{"question":"How do I close my account?"},"expected":"Delete account","relevant_ids":["account-deletion"]}
+{"id":"delete-when","vars":{"question":"How many days does account deletion take?"},"expected":"14 days","relevant_ids":["account-deletion"]}
+{"id":"password-link","vars":{"question":"How long is the password reset link valid?"},"expected":"1 hour","relevant_ids":["password-reset"]}
+{"id":"password-lock","vars":{"question":"What happens after too many wrong sign in attempts?"},"expected":"locked","relevant_ids":["password-reset"]}
+{"id":"intl-time","vars":{"question":"How many business days does international delivery take?"},"expected":"7-14 business days","relevant_ids":["international"]}
+{"id":"intl-tax","vars":{"question":"Who pays import taxes?"},"expected":"recipient","relevant_ids":["international"]}
+{"id":"damage-window","vars":{"question":"Within how many hours must I report a damaged parcel?"},"expected":"48 hours","relevant_ids":["damaged-items"]}
+{"id":"damage-proof","vars":{"question":"What should I send to show the damage?"},"expected":"photo","relevant_ids":["damaged-items"]}
+{"id":"locker-hold","vars":{"question":"How long will a locker keep my parcel?"},"expected":"7 days","relevant_ids":["locker-pickup"]}
+{"id":"locker-code","vars":{"question":"How do I get the pickup code for a locker?"},"expected":"pickup code","relevant_ids":["locker-pickup"]}
+{"id":"support-hours","vars":{"question":"When is support open?"},"expected":"Monday to Friday","relevant_ids":["contact-support"]}
+{"id":"support-phone","vars":{"question":"Is there a phone number?"},"expected":"not available","relevant_ids":["contact-support"]}
+{"id":"ship-cutoff","vars":{"question":"When does an order placed late in the day leave the warehouse?"},"expected":"next business day","relevant_ids":["shipping-times"]}
+{"id":"ship-express-cost","vars":{"question":"How much does express delivery cost?"},"expected":"9 dollars","relevant_ids":["shipping-times"]}
+{"id":"track-number","vars":{"question":"When do I get a tracking number?"},"expected":"24 hours","relevant_ids":["tracking"]}
+{"id":"track-stuck","vars":{"question":"What if tracking has not moved for days?"},"expected":"contact support","relevant_ids":["tracking"]}
+{"id":"return-sale","vars":{"question":"Can sale items be returned?"},"expected":"store credit","relevant_ids":["returns"]}
+{"id":"return-condition","vars":{"question":"What condition must returned items be in?"},"expected":"original packaging","relevant_ids":["returns"]}
+{"id":"refund-where","vars":{"question":"Where does my refund go?"},"expected":"original payment method","relevant_ids":["refunds"]}
+{"id":"refund-notice","vars":{"question":"How will I know the refund has been sent?"},"expected":"email","relevant_ids":["refunds"]}
+{"id":"warranty-covers","vars":{"question":"What does the warranty cover?"},"expected":"manufacturing defects","relevant_ids":["warranty"]}
+{"id":"warranty-claim","vars":{"question":"How do I make a warranty claim?"},"expected":"order number","relevant_ids":["warranty"]}
+{"id":"pay-when","vars":{"question":"When is payment taken?"},"expected":"when the order ships","relevant_ids":["payment-methods"]}
+{"id":"pay-gift","vars":{"question":"Can I use a gift card?"},"expected":"one other payment method","relevant_ids":["payment-methods"]}
+{"id":"delete-history","vars":{"question":"How long is order history kept after deletion?"},"expected":"7 years","relevant_ids":["account-deletion"]}
+{"id":"delete-cancel","vars":{"question":"Can I cancel deleting my account?"},"expected":"logging in","relevant_ids":["account-deletion"]}
+{"id":"password-2fa","vars":{"question":"How long does a two factor code last?"},"expected":"30 seconds","relevant_ids":["password-reset"]}
+{"id":"password-locked","vars":{"question":"How long is an account locked?"},"expected":"15 minutes","relevant_ids":["password-reset"]}
+{"id":"intl-countries","vars":{"question":"How many countries do you ship to?"},"expected":"40 countries","relevant_ids":["international"]}
+{"id":"intl-batteries","vars":{"question":"Can batteries be shipped abroad?"},"expected":"cannot ship batteries","relevant_ids":["international"]}
+{"id":"damage-offer","vars":{"question":"What can you offer if my parcel is damaged?"},"expected":"free replacement","relevant_ids":["damaged-items"]}
+{"id":"damage-packaging","vars":{"question":"How long should I keep the packaging?"},"expected":"claim is closed","relevant_ids":["damaged-items"]}
+{"id":"locker-uncollected","vars":{"question":"What happens to parcels nobody collects?"},"expected":"returned to the warehouse","relevant_ids":["locker-pickup"]}
+{"id":"locker-open-hours","vars":{"question":"When are lockers open?"},"expected":"24 hours","relevant_ids":["locker-pickup"]}
+{"id":"support-chat","vars":{"question":"How fast does live chat reply?"},"expected":"5 minutes","relevant_ids":["contact-support"]}
+{"id":"support-email","vars":{"question":"How quickly do you answer email?"},"expected":"1 business day","relevant_ids":["contact-support"]}

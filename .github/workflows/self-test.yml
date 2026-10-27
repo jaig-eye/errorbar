@@ -1,0 +1,40 @@
+name: self-test
+
+# errorbar gating its own examples. Both suites run offline (mock provider, a Python BM25
+# retriever), so this needs no secrets and also works on pull requests from forks.
+# Every run on main uploads a baseline; pull requests are compared with it.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  actions: read # find the baseline from main
+  pull-requests: write # post the report
+
+concurrency:
+  group: self-test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  support-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./
+        with:
+          working-directory: examples/support-bot
+          artifact-name: errorbar-support-bot
+          comment-tag: support-bot
+
+  rag-python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: ./
+        with:
+          working-directory: examples/rag-python
+          artifact-name: errorbar-rag-python
+          comment-tag: rag-python

@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jaig-eye/errorbar/main/schema/errorbar.schema.json
+#
+# A RAG pipeline you already have, in any language, run as a command. This one is a tiny
+# Python retriever (BM25 over docs/, no dependencies, no model) so the example runs anywhere:
+#
+#   npx errorbar run --config examples/rag-python/errorbar.yaml
+#
+# errorbar starts `rag.py` once, sends it one JSON request per line on stdin and reads one JSON
+# reply per line from stdout. See rag.py for the protocol.
+#
+# On Windows, use `python` instead of `python3`.
+version: 1
+
+suites:
+  - name: help-center-rag
+    dataset: dataset.jsonl
+    trials: 1 # the pipeline never varies, so one trial is enough. Use 3+ if it samples a model.
+    target:
+      type: command
+      command: [python3, rag.py]
+      timeout_ms: 20000
+      env:
+        # The knob a demo pull request turns to show a regression: indexing only the first 100
+        # characters of each document. 0 indexes whole documents.
+        RAG_INDEX_CHARS: "0"
+        RAG_TOP_K: "3"
+    metrics:
+      # Retrieval: is the document that answers the question near the top?
+      - { type: recall_at_k, k: 1 }
+      - { type: recall_at_k, k: 3 }
+      - { type: mrr }
+      # Generation: does the answer contain the fact from the case's `expected` field?
+      - { type: contains, name: answer_has_fact }

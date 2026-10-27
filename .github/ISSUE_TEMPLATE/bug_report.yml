@@ -1,0 +1,44 @@
+name: Bug report
+description: Something errorbar did was wrong or surprising
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Please do not paste API keys, and check that prompts or outputs in
+        your logs are fine to share.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: dropdown
+    id: where
+    attributes:
+      label: Where did it happen?
+      options:
+        - GitHub Action
+        - CLI (npx errorbar)
+        - Both
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: errorbar version
+      description: The Action ref (for example v0.1.0 or a commit SHA), or the output of `errorbar version`.
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: Config
+      description: Your errorbar.yaml, trimmed to the part that matters. Remove anything private.
+      render: yaml
+  - type: textarea
+    id: report
+    attributes:
+      label: Report or log output
+      description: The PR comment, job summary or terminal output.
+      render: markdown

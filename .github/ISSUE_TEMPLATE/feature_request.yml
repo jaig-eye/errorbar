@@ -1,0 +1,19 @@
+name: Feature request
+description: Suggest something errorbar should do
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the situation first. The solution can come second.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like errorbar to do?
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What do you do today instead?

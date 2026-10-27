@@ -1,0 +1,64 @@
+name: errorbar
+description: >-
+  Run a prompt or RAG eval suite on every pull request and fail the build only when quality
+  drops by more than the noise can explain.
+author: jaig-eye
+branding:
+  icon: bar-chart-2
+  color: blue
+
+inputs:
+  config:
+    description: Path to the errorbar config file.
+    default: errorbar.yaml
+  working-directory:
+    description: Directory the `config` path is resolved from. Paths inside the config are relative to the config file.
+    default: .
+  suite:
+    description: Run only the suite with this name. Runs every suite when empty.
+    default: ''
+  baseline:
+    description: >-
+      Where the baseline comes from. `artifact` uses the latest successful run on the base
+      branch, `file` reads `baseline-path`, `none` skips the comparison.
+    default: artifact
+  baseline-path:
+    description: Path to a committed baseline results.json. Used when `baseline` is `file`.
+    default: ''
+  baseline-branch:
+    description: Branch to take the baseline artifact from. Defaults to the pull request base branch.
+    default: ''
+  artifact-name:
+    description: Name of the artifact that carries results.json between runs.
+    default: errorbar-results
+  artifact-retention-days:
+    description: Days to keep the results artifact. Baselines older than this are gone.
+    default: '30'
+  comment:
+    description: Post (and keep updating) a pull request comment with the report.
+    default: 'true'
+  comment-tag:
+    description: >-
+      Tag that keeps this job's comment separate from another errorbar job's comment on the same
+      pull request. Set it when one workflow runs errorbar more than once.
+    default: ''
+  on-missing-secrets:
+    description: >-
+      What to do when a provider API key is not set. `auto` skips on pull requests from forks
+      and fails everywhere else. `skip` always skips, `fail` always fails.
+    default: auto
+  github-token:
+    description: Token used to find the baseline artifact and to post the comment.
+    default: ${{ github.token }}
+
+outputs:
+  verdict:
+    description: One of pass, warn, fail, error, no_baseline, recorded (a push, nothing to compare) or skipped.
+  results-path:
+    description: Path to the results.json written by this run.
+  report-path:
+    description: Path to the Markdown report.
+
+runs:
+  using: node24
+  main: dist/index.js

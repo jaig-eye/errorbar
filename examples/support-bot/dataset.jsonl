@@ -1,0 +1,30 @@
+{"id":"ship-standard","vars":{"question":"How long does a normal order take to arrive?"},"expected":"3-5 business days"}
+{"id":"ship-express","vars":{"question":"I need it fast. How quick is express delivery?"},"expected":"1-2 business days"}
+{"id":"ship-express-cost","vars":{"question":"What does express shipping cost?"},"expected":"9 dollars"}
+{"id":"ship-free","vars":{"question":"At what order value is delivery free?"},"expected":"50 dollars"}
+{"id":"return-window","vars":{"question":"How many days do I have to send something back?"},"expected":"30 days"}
+{"id":"return-label","vars":{"question":"Do I have to pay for the return postage?"},"expected":"prepaid label"}
+{"id":"return-sale","vars":{"question":"Can I return a sale item for my money back?"},"expected":"store credit"}
+{"id":"refund-time","vars":{"question":"How soon do I get my money back after returning something?"},"expected":"5-7 business days"}
+{"id":"refund-where","vars":{"question":"Which payment method does a refund go to?"},"expected":"original payment method"}
+{"id":"warranty-length","vars":{"question":"How long is the hardware guarantee?"},"expected":"12 month"}
+{"id":"warranty-water","vars":{"question":"I spilled water on it. Is that covered?"},"expected":"water damage"}
+{"id":"warranty-drop","vars":{"question":"It broke when I dropped it. Will the warranty help?"},"expected":"accidental drops"}
+{"id":"pay-cards","vars":{"question":"Which cards can I pay with?"},"expected":"Visa"}
+{"id":"pay-paypal","vars":{"question":"Is PayPal accepted?"},"expected":"PayPal"}
+{"id":"pay-cash","vars":{"question":"Can I give the courier cash when it arrives?"},"expected":"not available"}
+{"id":"damage-window","vars":{"question":"My box arrived crushed. How long do I have to tell you?"},"expected":"48 hours"}
+{"id":"damage-proof","vars":{"question":"What proof of the damage do you need?"},"expected":"photo"}
+{"id":"locker-hold","vars":{"question":"How long will a locker keep my parcel?"},"expected":"7 days"}
+{"id":"locker-code","vars":{"question":"How do I get the code to open the locker?"},"expected":"SMS"}
+{"id":"password-link","vars":{"question":"For how long does the password reset link work?"},"expected":"1 hour"}
+{"id":"hours","vars":{"question":"When can I reach a human?"},"expected":"Monday to Friday"}
+{"id":"chat-speed","vars":{"question":"How fast does live chat answer?"},"expected":"5 minutes"}
+{"id":"email-speed","vars":{"question":"If I email you, when will I hear back?"},"expected":"1 business day"}
+{"id":"gift-wrap","vars":{"question":"Do you offer gift wrapping?"},"expected":"pass it to a human"}
+{"id":"price-match","vars":{"question":"Will you match a cheaper price from another shop?"},"expected":"pass it to a human"}
+{"id":"ship-weekend","vars":{"question":"Do you deliver on Sundays?"},"expected":"pass it to a human"}
+{"id":"ship-standard-2","vars":{"question":"Roughly how many working days until a standard parcel gets here?"},"expected":"3-5 business days"}
+{"id":"return-window-2","vars":{"question":"What is the time limit for returning an unused item?"},"expected":"30 days"}
+{"id":"refund-time-2","vars":{"question":"How many working days does a refund take?"},"expected":"5-7 business days"}
+{"id":"warranty-length-2","vars":{"question":"For what period is my device under warranty?"},"expected":"12 month"}

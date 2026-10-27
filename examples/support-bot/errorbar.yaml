@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jaig-eye/errorbar/main/schema/errorbar.schema.json
+#
+# A prompt suite: does the support assistant still state the right policy?
+# It runs offline on the built-in mock provider, so you can try it with no API key:
+#
+#   npx errorbar run --config examples/support-bot/errorbar.yaml
+#
+# To use a real model, replace the provider below and delete the `judge` line and the
+# mock-accuracy comment in prompts/answer.md.
+version: 1
+
+defaults:
+  trials: 3 # each case runs 3 times so run-to-run noise can be measured
+  provider:
+    type: mock
+    # type: anthropic
+    # model: claude-haiku-5-5
+    # max_tokens: 300
+
+gate:
+  max_drop: 0.03 # fail only for a real drop of at least 3 points
+
+suites:
+  - name: support-bot
+    dataset: dataset.jsonl
+    target:
+      type: prompt
+      system: prompts/system.md
+      prompt: prompts/answer.md
+    metrics:
+      # Is the policy fact from the case's `expected` field in the answer?
+      - type: contains
+        name: states_the_policy
+
+      # Answers should stay short.
+      - type: max_length
+        name: brief
+        max: 60
+        unit: words
+
+      # A judge scores the answer against a rubric from 1 to 5.
+      - type: rubric
+        name: helpfulness
+        rubric: >-
+          The answer is correct according to the reference, directly answers the question, and
+          adds nothing the customer did not ask for.
+        judge: { type: mock }

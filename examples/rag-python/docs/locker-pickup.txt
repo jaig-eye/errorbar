@@ -1,0 +1,1 @@
+Parcels delivered to a locker are held for 7 days. You get a 6 digit pickup code by SMS when the parcel arrives. After 7 days uncollected parcels are returned to the warehouse. Lockers are open 24 hours a day.

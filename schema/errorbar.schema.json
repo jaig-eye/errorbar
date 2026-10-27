@@ -1,0 +1,431 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/jaig-eye/errorbar/main/schema/errorbar.schema.json",
+  "title": "errorbar config",
+  "description": "Configuration for errorbar, an LLM eval regression gate for pull requests.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "suites"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": 1, "description": "Config format version. Always 1 for now." },
+    "defaults": { "$ref": "#/definitions/defaults" },
+    "gate": { "$ref": "#/definitions/gate" },
+    "redact": {
+      "description": "Regular expressions. Anything they match is replaced with [redacted] in stored outputs.",
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "max_calls": {
+      "description": "Safety cap on provider calls in one run. The run aborts when it is exceeded.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "suites": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/definitions/suite" }
+    }
+  },
+  "definitions": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9 _.@:/+-]*$"
+    },
+    "defaults": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "trials": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 50,
+          "description": "Times each case is run. 3 or more lets errorbar see run-to-run noise."
+        },
+        "concurrency": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "provider": {
+          "$ref": "#/definitions/provider",
+          "description": "Model used by prompt targets."
+        },
+        "judge": {
+          "$ref": "#/definitions/provider",
+          "description": "Model used by rubric metrics. Falls back to the target's provider, then to defaults.provider."
+        }
+      }
+    },
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "confidence": {
+          "type": "number",
+          "exclusiveMinimum": 0.5,
+          "exclusiveMaximum": 1,
+          "description": "Two-sided confidence level for each metric's change. Default 0.95."
+        },
+        "max_drop": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Largest acceptable drop on the 0-1 score scale. Default 0.03."
+        },
+        "on_inconclusive": {
+          "enum": ["warn", "fail", "pass"],
+          "description": "What a metric that cannot be called either way does to the build. Default warn."
+        },
+        "bootstrap": {
+          "type": "integer",
+          "minimum": 200,
+          "maximum": 200000,
+          "description": "Bootstrap resamples. Default 10000."
+        },
+        "seed": { "type": "string", "description": "Makes verdicts repeatable. Default errorbar." },
+        "min_cases": {
+          "type": "integer",
+          "minimum": 2,
+          "description": "Fewer paired cases than this is never a verdict. Default 10."
+        },
+        "max_error_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Share of errored trials allowed before the run counts as broken. Default 0.1."
+        },
+        "flaky_threshold": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 1,
+          "description": "A case is flaky when its trials differ by at least this on a metric. Default 0.5."
+        }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["anthropic", "openai", "mock"] },
+        "model": { "type": "string", "minLength": 1 },
+        "temperature": {
+          "type": ["number", "null"],
+          "minimum": 0,
+          "maximum": 2,
+          "description": "null leaves the parameter out of the request."
+        },
+        "max_tokens": { "type": "integer", "minimum": 1 },
+        "base_url": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Override the API base URL. Use it for Azure, Groq, OpenRouter, Ollama, vLLM and other OpenAI-compatible servers."
+        },
+        "api_key_env": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Environment variable holding the API key."
+        },
+        "timeout_ms": { "type": "integer", "minimum": 1000 },
+        "max_retries": { "type": "integer", "minimum": 0, "maximum": 10 },
+        "max_tokens_param": {
+          "enum": ["max_tokens", "max_completion_tokens"],
+          "description": "openai only. Which request field carries the output limit."
+        },
+        "accuracy": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "mock only. Chance of answering with the expected value."
+        }
+      }
+    },
+    "suite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": { "$ref": "#/definitions/name" },
+        "dataset": {
+          "type": "string",
+          "minLength": 1,
+          "description": "JSONL file, one case per line."
+        },
+        "target": { "$ref": "#/definitions/target" },
+        "results": {
+          "type": "string",
+          "minLength": 1,
+          "description": "JSONL of scores from another tool, used instead of dataset + target."
+        },
+        "trials": { "type": "integer", "minimum": 1, "maximum": 50 },
+        "concurrency": { "type": "integer", "minimum": 1, "maximum": 64 },
+        "metrics": {
+          "description": "What to score. Required with a target. Not used with `results`, where every metric in the file is gated.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/definitions/metric" }
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "required": ["type"],
+      "properties": { "type": { "enum": ["prompt", "command"] } },
+      "allOf": [
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "prompt" } } },
+          "then": { "$ref": "#/definitions/target_prompt" }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "command" } } },
+          "then": { "$ref": "#/definitions/target_command" }
+        }
+      ]
+    },
+    "target_prompt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "prompt"],
+      "properties": {
+        "type": { "const": "prompt" },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Prompt template file. {{name}} is replaced with the case's vars."
+        },
+        "system": { "type": "string", "minLength": 1, "description": "System prompt file." },
+        "provider": { "$ref": "#/definitions/provider" }
+      }
+    },
+    "target_command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "command"],
+      "properties": {
+        "type": { "const": "command" },
+        "command": {
+          "description": "Your pipeline. Started once and kept running; it reads one JSON request per line on stdin and answers one JSON line on stdout.",
+          "oneOf": [
+            { "type": "string", "minLength": 1 },
+            { "type": "array", "minItems": 1, "items": { "type": "string" } }
+          ]
+        },
+        "workers": { "type": "integer", "minimum": 1, "maximum": 32 },
+        "timeout_ms": { "type": "integer", "minimum": 1000 },
+        "cwd": { "type": "string", "minLength": 1 },
+        "env": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "metric": {
+      "type": "object",
+      "required": ["type"],
+      "properties": {
+        "type": {
+          "enum": [
+            "equals",
+            "contains",
+            "not_contains",
+            "regex",
+            "json_valid",
+            "json_schema",
+            "max_length",
+            "recall_at_k",
+            "mrr",
+            "rubric",
+            "faithfulness",
+            "answer_relevance"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "equals" } } },
+          "then": { "$ref": "#/definitions/metric_equals" }
+        },
+        {
+          "if": {
+            "required": ["type"],
+            "properties": { "type": { "enum": ["contains", "not_contains"] } }
+          },
+          "then": { "$ref": "#/definitions/metric_contains" }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "regex" } } },
+          "then": { "$ref": "#/definitions/metric_regex" }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "json_valid" } } },
+          "then": { "$ref": "#/definitions/metric_json_valid" }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "json_schema" } } },
+          "then": { "$ref": "#/definitions/metric_json_schema" }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "max_length" } } },
+          "then": { "$ref": "#/definitions/metric_max_length" }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "recall_at_k" } } },
+          "then": { "$ref": "#/definitions/metric_recall_at_k" }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "mrr" } } },
+          "then": { "$ref": "#/definitions/metric_mrr" }
+        },
+        {
+          "if": { "required": ["type"], "properties": { "type": { "const": "rubric" } } },
+          "then": { "$ref": "#/definitions/metric_rubric" }
+        },
+        {
+          "if": {
+            "required": ["type"],
+            "properties": { "type": { "enum": ["faithfulness", "answer_relevance"] } }
+          },
+          "then": { "$ref": "#/definitions/metric_preset" }
+        }
+      ]
+    },
+    "metric_equals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "equals" },
+        "name": { "$ref": "#/definitions/name" },
+        "gate": { "type": "boolean" },
+        "max_drop": { "type": "number", "minimum": 0, "maximum": 1 },
+        "value": {
+          "type": "string",
+          "description": "Compared against this text. Defaults to the case's expected field."
+        },
+        "ignore_case": { "type": "boolean" },
+        "trim": { "type": "boolean" }
+      }
+    },
+    "metric_contains": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["contains", "not_contains"] },
+        "name": { "$ref": "#/definitions/name" },
+        "gate": { "type": "boolean" },
+        "max_drop": { "type": "number", "minimum": 0, "maximum": 1 },
+        "value": {
+          "type": "string",
+          "description": "Text to look for. Defaults to the case's expected field."
+        },
+        "ignore_case": { "type": "boolean" }
+      }
+    },
+    "metric_regex": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "pattern"],
+      "properties": {
+        "type": { "const": "regex" },
+        "name": { "$ref": "#/definitions/name" },
+        "gate": { "type": "boolean" },
+        "max_drop": { "type": "number", "minimum": 0, "maximum": 1 },
+        "pattern": { "type": "string", "minLength": 1 },
+        "flags": { "type": "string", "pattern": "^[imsu]*$" }
+      }
+    },
+    "metric_json_valid": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "json_valid" },
+        "name": { "$ref": "#/definitions/name" },
+        "gate": { "type": "boolean" },
+        "max_drop": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "metric_json_schema": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "schema"],
+      "properties": {
+        "type": { "const": "json_schema" },
+        "name": { "$ref": "#/definitions/name" },
+        "gate": { "type": "boolean" },
+        "max_drop": { "type": "number", "minimum": 0, "maximum": 1 },
+        "schema": { "type": "object", "description": "JSON Schema the output must satisfy." }
+      }
+    },
+    "metric_max_length": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "max"],
+      "properties": {
+        "type": { "const": "max_length" },
+        "name": { "$ref": "#/definitions/name" },
+        "gate": { "type": "boolean" },
+        "max_drop": { "type": "number", "minimum": 0, "maximum": 1 },
+        "max": { "type": "integer", "minimum": 1 },
+        "unit": { "enum": ["chars", "words"] }
+      }
+    },
+    "metric_recall_at_k": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "k"],
+      "properties": {
+        "type": { "const": "recall_at_k" },
+        "name": { "$ref": "#/definitions/name" },
+        "gate": { "type": "boolean" },
+        "max_drop": { "type": "number", "minimum": 0, "maximum": 1 },
+        "k": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "metric_mrr": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "const": "mrr" },
+        "name": { "$ref": "#/definitions/name" },
+        "gate": { "type": "boolean" },
+        "max_drop": { "type": "number", "minimum": 0, "maximum": 1 },
+        "k": { "type": "integer", "minimum": 1, "description": "Ignore anything ranked below k." }
+      }
+    },
+    "metric_rubric": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "name", "rubric"],
+      "properties": {
+        "type": { "const": "rubric" },
+        "name": { "$ref": "#/definitions/name" },
+        "gate": { "type": "boolean" },
+        "max_drop": { "type": "number", "minimum": 0, "maximum": 1 },
+        "rubric": {
+          "type": "string",
+          "minLength": 1,
+          "description": "What a good answer looks like. The judge scores against it."
+        },
+        "scale": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 10,
+          "description": "Judge scores 1..scale. 2 means fail/pass. Default 5."
+        },
+        "judge": { "$ref": "#/definitions/provider" }
+      }
+    },
+    "metric_preset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type"],
+      "properties": {
+        "type": { "enum": ["faithfulness", "answer_relevance"] },
+        "name": { "$ref": "#/definitions/name" },
+        "gate": { "type": "boolean" },
+        "max_drop": { "type": "number", "minimum": 0, "maximum": 1 },
+        "scale": { "type": "integer", "minimum": 2, "maximum": 10 },
+        "judge": { "$ref": "#/definitions/provider" }
+      }
+    }
+  }
+}
